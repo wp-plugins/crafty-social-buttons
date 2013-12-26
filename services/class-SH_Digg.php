@@ -43,8 +43,8 @@ class SH_Digg extends SH_Social_Service {
 		return $html;
 	}
 	
-	public function shareCount($url) {
-		 return '0'; // Digg has no share count feature
+	public static function description() {
+		return "Hint: www.digg.com/<strong>user-id</strong>";	
 	}
 }
 ?>
