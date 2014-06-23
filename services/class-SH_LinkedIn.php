@@ -51,7 +51,6 @@ class SH_LinkedIn extends SH_Social_Service {
         return $html;
   	}
 
-
 	public function shareCount($url) {
    	
 		 $response = wp_remote_get('http://www.linkedin.com/countserv/count/share?format=json&url=' . $url);
