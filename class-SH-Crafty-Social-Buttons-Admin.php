@@ -249,6 +249,8 @@ class SH_Crafty_Social_Buttons_Admin {
 		add_settings_field( 'link_services', __( 'Show these services', $this->plugin_slug ),
 			array( $this, 'render_service_select' ), $page, $section, array( 'link_services' ) );
 
+        add_settings_field( 'new_window', __( 'Open in new window', $this->plugin_slug ),
+            array( $this, 'renderCheckbox' ), $page, $section, array( 'new_window' ) );
 
 		$section = 'cbs_link_service_settings';
 		add_settings_section( $section, __( 'User IDs', $this->plugin_slug ), array(
@@ -354,7 +356,7 @@ class SH_Crafty_Social_Buttons_Admin {
 	 */
 	public function displayLinkSettingsText() {
 		echo '<p>';
-		_e( 'Link Buttons will link to your user profile on each site.', $this->plugin_slug );
+		_e( 'Link Buttons will link to your user profile on each site.  Add them to the theme using the Crafty Social Buttons <strong>widget</strong>.', $this->plugin_slug );
 		echo '</p><p>';
 		_e( 'Enter your <strong>user id</strong> for each service you choose below to make the button link directly to your profile.', $this->plugin_slug );
 		echo '</p>';
@@ -380,9 +382,9 @@ class SH_Crafty_Social_Buttons_Admin {
 		$value       = $settings[ $id ];
 		?>
 
-		<input type="checkbox" id="<?= $id ?>" name="<?= $name ?>" <?php echo checked( 1, $value ) ?> value="0"/>
-		<span class="description" for="<?= $id ?>">
-                <?= $description ?>
+		<input type="checkbox" id="<?php echo $id ?>" name="<?php echo $name ?>" <?php echo checked( 1, $value ) ?> value="0"/>
+		<span class="description" for="<?php echo $id ?>">
+                <?php echo $description ?>
             </span>
 
 	<?php
@@ -401,10 +403,10 @@ class SH_Crafty_Social_Buttons_Admin {
         ?>
 
         <?php foreach ($options as $key => $label) { ?>
-        <input type="radio" id="<?= $id ?>" name="<?= $name ?>" <?= checked( $key, $value ); ?> value="<?= $key ?>"/> <?= $label; ?>
+        <input type="radio" id="<?php echo $id ?>" name="<?php echo $name ?>" <?php echo checked( $key, $value ); ?> value="<?php echo $key ?>"/> <?php echo $label; ?>
         <?php } ?>
-        <span class="description" for="<?= $id ?>">
-                <?= $description ?>
+        <span class="description" for="<?php echo $id ?>">
+                <?php echo $description ?>
             </span>
 
     <?php
@@ -422,9 +424,9 @@ class SH_Crafty_Social_Buttons_Admin {
 
 		?>
 
-		<input type="text" id="<?= $id ?>" name="<?= $name ?>" value="<?= $value ?>"/>
+		<input type="text" id="<?php echo $id ?>" name="<?php echo $name ?>" value="<?php echo $value ?>"/>
 		<span class="description">
- 	           <?= $description ?>
+ 	           <?php echo $description ?>
             </span>
 
 	<?php
@@ -444,10 +446,10 @@ class SH_Crafty_Social_Buttons_Admin {
 
 		?>
 
-		<input type="number" id="<?= $id ?>" name="<?= $name ?>" value="<?= $value ?>" min="<?= $min ?>"
-		       max="<?= $max ?>"/>
+		<input type="number" id="<?php echo $id ?>" name="<?php echo $name ?>" value="<?php echo $value ?>" min="<?php echo $min ?>"
+		       max="<?php echo $max ?>"/>
 		<span class="description">
- 	           <?= $description ?>
+ 	           <?php echo $description ?>
             </span>
 
 	<?php
@@ -464,11 +466,11 @@ class SH_Crafty_Social_Buttons_Admin {
 		$base     = plugin_dir_url( __FILE__ ) . "buttons/";
 		?>
 
-		<select id="<?= $id ?>" class="csb-image-set" name="<?= $name ?>">
+		<select id="<?php echo $id ?>" class="csb-image-set" name="<?php echo $name ?>">
 
 			<?php foreach ( $this->all_image_sets as $set ) { ?>
-				<option value="<?= $set ?>" <?php echo selected( $set, $value );?>">
-    		    	<?=$set?>
+				<option value="<?php echo $set ?>" <?php echo selected( $set, $value );?>">
+    		    	<?php echo$set?>
     	    	</option>
     		<?php } ?>
 
@@ -494,10 +496,10 @@ class SH_Crafty_Social_Buttons_Admin {
 
 			<div class="csb-include-list chosen">
 				<div><span class="include-heading"><?php _e('Selected',$this->plugin_slug); ?></span> (<?php _e('these will be displayed',$this->plugin_slug);?></div>
-				<ul id="csbsort2" class="connectedSortable data-base="<?= $image_set ?>"">
+				<ul id="csbsort2" class="connectedSortable data-base="<?php echo $image_set ?>"">
 					<?php echo $this->get_selected_services_html( $value, $image_set, $image_size ); ?>
 				</ul>
-				<input type="hidden" name="<?= $name ?>" id="<?= $id ?>" class="csb-services"/>
+				<input type="hidden" name="<?php echo $name ?>" id="<?php echo $id ?>" class="csb-services"/>
 			</div>
 
 			<div class="csb-include-list available">
@@ -523,7 +525,7 @@ class SH_Crafty_Social_Buttons_Admin {
 		$value    = $settings[ $id ];
 		?>
 
-		<select id="<?= $id ?>" name="<?= $name ?>">
+		<select id="<?php echo $id ?>" name="<?php echo $name ?>">
 			<option
 				value="above" <?php echo selected( 'above', $value ); ?> ><?php _e( 'Above', $this->plugin_slug ) ?></option>
 			<option
@@ -561,7 +563,6 @@ class SH_Crafty_Social_Buttons_Admin {
 
             // parse out our radio buttons, they are constrained so just take the values
             $settings['open_in']            = $input['open_in'];
-            $settings['new_window']         = $input['open_in'] == 'new_window';
             $settings['popup']              = $input['open_in'] == 'popup';
 
 			// our select boxes have constrained UI, so just update them
@@ -580,12 +581,15 @@ class SH_Crafty_Social_Buttons_Admin {
 
 		} else if ( 'link_options' == $tab ) {
 
-			// our select boxes have constrained UI, so just update them
+            // check if checkboxes are set
+            $settings['new_window']     = isset( $input['new_window'] );
+
+            // our select boxes have constrained UI, so just update them
 			$settings['link_image_set'] = $input['link_image_set'];
 			$settings['link_services']  = $input['link_services'];
 
 			// and finally, validate our text boxes
-			$settings['link_caption'] = sanitize_text_field( $input['link_caption'] );
+			$settings['link_caption']   = sanitize_text_field( $input['link_caption'] );
 
 			// including numeric ones
 			$settings['link_image_size'] = $this->sanitize_image_size( $input['link_image_size'] );

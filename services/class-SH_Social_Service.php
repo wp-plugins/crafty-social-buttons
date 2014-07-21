@@ -21,8 +21,8 @@ class SH_Social_Service {
 
 		$this->imageExtension = ".png";
 		$this->imageSize = $settings[$type.'_image_size'];
-		$this->newWindow = $settings['new_window'];
-        $this->popup = $settings['popup'];
+		$this->newWindow = ($type == "link" ? $settings['new_window'] : $settings['open_in'] == 'new_window');
+        $this->popup = ($type == 'share' && $settings['popup']);
 	}
 	
 	// generates the css class for the button link
@@ -84,7 +84,7 @@ class SH_Social_Service {
 		if ($display) {
 			$slug = trim(strtolower($this->service));
 			$key = $this->key;
-			return '<span id="crafty-social-share-count-'.$slug.'-'.$key.'" class="crafty-social-share-count">0</span>';
+			return '<span class="crafty-social-share-count-'.$slug.'-'.$key.' crafty-social-share-count">0</span>';
 		} else {
 			return '';
 		}
