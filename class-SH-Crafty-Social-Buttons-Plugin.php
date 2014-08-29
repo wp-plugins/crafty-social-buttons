@@ -12,7 +12,7 @@ class SH_Crafty_Social_Buttons_Plugin {
 	/**
 	 * Plugin version, used for cache-busting of style and script file references.
 	 */
-	protected $version = '1.3.1';
+	protected $version = '1.3.2';
 
 	/**
 	 * Unique identifier for this plugin.
@@ -249,13 +249,25 @@ class SH_Crafty_Social_Buttons_Plugin {
 				wp_die(json_encode($result));
 			}
 
+            // get key
+            $key = isset($_GET['key']) ? $_GET['key'] : '';
+            if (empty($key)) {
+                $result->error = true;
+                $result->message = __( 'Key not specified.', $this->plugin_slug );
+                wp_die(json_encode($result));
+            }
+
 			// get url
-			$url = isset($_GET['url']) ? $_GET['url'] : '';
-			if (empty($url)) {
-				$result->error = true;
-				$result->message = __( 'Url not specified.', $this->plugin_slug );
-				wp_die(json_encode($result));
-			}
+            if ($key == "page") {
+                $url = isset($_GET['url']) ? $_GET['url'] : '';
+                if (empty($url)) {
+                    $result->error = true;
+                    $result->message = __( 'Url not specified.', $this->plugin_slug );
+                    wp_die(json_encode($result));
+                }
+            } else {
+                $url = get_permalink($key);
+            }
 
 			include_once(plugin_dir_path(__FILE__) . "services/class-SH_Social_Service.php");
 			$class = "SH_$service";
@@ -308,6 +320,8 @@ class SH_Crafty_Social_Buttons_Plugin {
 			'show_on_category'		=> false,
 			'show_on_archive'		=> false,
 			'position'				=> 'below',
+			'share_caption_position'=> 'inline-block',
+			'share_alignment'		=> 'left',
 			'show_count'			=> false,
             'open_in'			    => 'new_window',
             'popup'			        => false,
@@ -318,6 +332,8 @@ class SH_Crafty_Social_Buttons_Plugin {
 			'link_image_set'	 	=> 'simple',
 			'link_image_size'		=> 48,
 			'link_caption'			=> 'Find me on:',
+			'link_caption_position'	=> 'inline-block',
+			'link_alignment'	    => 'left',
 			'link_services'		    => 'Facebook,Google,Twitter,Ravelry,Etsy',
             'new_window'			=> true,
 		);

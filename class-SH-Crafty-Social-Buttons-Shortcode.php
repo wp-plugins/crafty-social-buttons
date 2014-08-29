@@ -160,12 +160,12 @@ class SH_Crafty_Social_Buttons_Shortcode {
 		// get settings
 		$settings = $this->getSettings();
 		
-		$text = $settings[$type.'_caption'];
-		$selectedServices = explode(',', $settings[$type.'_services']);
-        $sizeKey = substr(strval($settings[$type.'_image_size']),0,1);
-		
-		// check if we should show the share count
-		$showCount = $settings['show_count'];
+		$text               = $settings[$type.'_caption'];
+		$selectedServices   = explode(',', $settings[$type.'_services']);
+        $sizeKey            = substr(strval($settings[$type.'_image_size']),0,1);
+		$alignment          = $settings[$type.'_alignment'];
+		$caption_position   = $settings[$type.'_caption_position'];
+		$showCount          = $settings['show_count'];
 		
 		// use wordpress functions for page/post details
 
@@ -181,15 +181,24 @@ class SH_Crafty_Social_Buttons_Shortcode {
         }
 
 		if ($showCount && $type == 'share') { // add url and title to JS for our scripts to access
+			$servicesWithShareCount = $this->get_services_with_share_count($selectedServices);
 			$data = array( 'url' => $url,
 						   'callbackUrl' => wp_nonce_url(admin_url( 'admin-ajax.php' ) . '?action=share_count'),
 			               'title' => $title,
-			               'services' => $selectedServices,
+			               'services' => $servicesWithShareCount,
 						   'key' => $postId);
             wp_localize_script( $this->plugin_slug . '-scripts', 'crafty_social_buttons_data_'.$postId, $data );
  		}
 
-		$buttonHtml = '<div class="crafty-social-buttons crafty-social-'.$type.'-buttons crafty-social-buttons-size-'.$sizeKey.'">';
+		$css_classes = array();
+		$css_classes[] = "crafty-social-buttons";
+		$css_classes[] = "crafty-social-$type-buttons";
+		$css_classes[] = "crafty-social-buttons-size-$sizeKey";
+		$css_classes[] = "crafty-social-buttons-align-$alignment";
+		$css_classes[] = "crafty-social-buttons-caption-$caption_position";
+		$css_class_string = join(" ", $css_classes);
+
+		$buttonHtml = '<div class="'.$css_class_string.'">';
 		if ($text != '') {
 				$buttonHtml .= '<span class="crafty-social-caption">' . $text . '</span>';
 		}
@@ -207,19 +216,30 @@ class SH_Crafty_Social_Buttons_Shortcode {
 		$buttonHtml .= '</ul></div>';		 
 		return $buttonHtml;
 	}
-	
-	/**
-	 * Generates the markup for an individual share button
-	 */
+
+	function get_services_with_share_count($selectedServices) {
+		$services = array();
+
+		foreach ($selectedServices as $serviceName) {
+			$this->ensure_class_included($serviceName);
+			$class = "SH_$serviceName";
+
+			if (class_exists($class)) {
+				$hasCount = $class::hasShareCount();
+				if ($hasCount)
+					$services[] = $serviceName;
+			}
+		}
+		return $services;
+	}
+
+	/** Generates the markup for an individual share button */
 	function get_individual_button_html($type, $serviceName, $url, $title, $showCount, $settings, $key) {
-			
-		include_once(plugin_dir_path(__FILE__) . "services/class-SH_Social_Service.php");
+
+		$this->ensure_class_included($serviceName);
 		$class = "SH_$serviceName";
 		
-		if (file_exists(plugin_dir_path(__FILE__) . "services/class-$class.php")) {
-		
-			$file = include_once(plugin_dir_path(__FILE__) . "services/class-$class.php");
-			
+		if (class_exists($class)) {
 			$service = new $class($type, $settings, $key);
 			
 			$username = isset($settings[$serviceName]) ? $settings[$serviceName] : '';
@@ -230,6 +250,20 @@ class SH_Crafty_Social_Buttons_Shortcode {
 			}
 		} else {
 			return "";	
+		}
+	}
+
+	function ensure_class_included($serviceName) {
+
+		if (!class_exists('SH_Social_Service'))
+			include_once(plugin_dir_path(__FILE__) . "services/class-SH_Social_Service.php");
+
+		$class = "SH_$serviceName";
+		if (!class_exists($class)) {
+			$file_path = plugin_dir_path(__FILE__) . "services/class-$class.php";
+			if (file_exists($file_path)){
+				$file = include_once( $file_path );
+			}
 		}
 	}
 
