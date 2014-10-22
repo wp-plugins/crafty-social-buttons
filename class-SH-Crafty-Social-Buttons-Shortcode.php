@@ -169,7 +169,7 @@ class SH_Crafty_Social_Buttons_Shortcode {
 		
 		// use wordpress functions for page/post details
 
-        if ($sharePageUrl) {
+        if ($sharePageUrl || !$post) {
             $postId = "page";
             $url = home_url( $wp->request );
             $title = wp_title(' ', false, 'right');
@@ -293,5 +293,4 @@ class SH_Crafty_Social_Buttons_Shortcode {
 	}
 
 
-} // end Plugin class
-?>
+}
