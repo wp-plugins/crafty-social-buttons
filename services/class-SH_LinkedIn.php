@@ -17,7 +17,7 @@ class SH_LinkedIn extends SH_Social_Service {
 	}
 
 	public function shareButtonUrl($url, $title) {
-
+		$title = urlencode($title);
 		return "http://www.linkedin.com/shareArticle?mini=true&url=$url&title=$title";
 	}
 
@@ -26,14 +26,14 @@ class SH_LinkedIn extends SH_Social_Service {
         if (strpos($username, 'http://') === 0 || strpos($username, 'https://') === 0) {
             $url = $username;
         } else if (strpos($username, "company/") === 0) {
-            $url = "http://linkedin.com/in/$username";
+			  $url = "http://linkedin.com/$username";
         } else {
-            $url = "http://linkedin.com/company/$username";
+			  $url = "http://linkedin.com/in/$username";
         }
 		return $url;
   	}
 
-	public function shareCount($url) {
+	public function fetchShareCount($url) {
    	
 		 $response = wp_remote_get('http://www.linkedin.com/countserv/count/share?format=json&url=' . $url);
 		 if (is_wp_error($response)){

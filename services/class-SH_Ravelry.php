@@ -18,6 +18,7 @@ class SH_Ravelry extends SH_Social_Service {
 
 	
 	public function shareButtonUrl($url, $title) {
+		$title = urlencode($title);
 
 		return "http://www.ravelry.com/bookmarklets/queue?url=$url&title=$title";
 	}
@@ -30,10 +31,6 @@ class SH_Ravelry extends SH_Social_Service {
 			$url = "http://www.ravelry.com/people/$username";
 		}
 		return $url;
-	}
-
-	public static function hasShareCount() {
-		return true;
 	}
 
 	public static function description() {

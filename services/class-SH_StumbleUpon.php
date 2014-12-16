@@ -17,6 +17,7 @@ class SH_StumbleUpon extends SH_Social_Service {
 	}
 
 	public function shareButtonUrl($url, $title) {
+		$title = urlencode($title);
 
 		return "http://www.stumbleupon.com/submit?url=$url&title=$title";
 	}
@@ -31,7 +32,7 @@ class SH_StumbleUpon extends SH_Social_Service {
 		return $url;
 	}
 	
-	public function shareCount($url) {
+	public function fetchShareCount($url) {
 		 $response = wp_remote_get('http://www.stumbleupon.com/services/1.01/badge.getinfo?url=' . $url);
 		 if (is_wp_error($response)){
             // return zero if response is error
