@@ -13,7 +13,7 @@ class SH_Crafty_Social_Buttons_Plugin
    /**
     * Plugin version, used for cache-busting of style and script file references.
     */
-   protected $version = '1.3.2';
+   protected $version = '1.4.1';
 
    /**
     * Unique identifier for this plugin.
@@ -192,8 +192,8 @@ class SH_Crafty_Social_Buttons_Plugin
 
       $settings = $this->getSettings();
 
-      // only add javascript if post counts are to be shown
-      if ($settings['show_count']) {
+      // only add javascript if post counts are to be shown or popups are enabled
+      if ($settings['show_count'] || $settings['popup']) {
 
          wp_enqueue_script($this->plugin_slug . '-scripts',
             plugins_url('js/public.min.js', __FILE__), array('jquery'), $this->version, true);
@@ -339,6 +339,9 @@ class SH_Crafty_Social_Buttons_Plugin
          'position' => 'below',
          'share_caption_position' => 'inline-block',
          'share_alignment' => 'left',
+         'share_float_buttons' => false,
+         'share_float_alignment' => 'right',
+         'share_float_height' => '30',
          'open_in' => 'new_window',
          'popup' => false,
          'email_body' => 'I thought you might like this: ',
