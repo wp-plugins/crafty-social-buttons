@@ -13,7 +13,7 @@ class SH_Crafty_Social_Buttons_Plugin
    /**
     * Plugin version, used for cache-busting of style and script file references.
     */
-   protected $version = '1.4.1';
+   protected $version = '1.5.0';
 
    /**
     * Unique identifier for this plugin.
@@ -189,15 +189,19 @@ class SH_Crafty_Social_Buttons_Plugin
     */
    public function enqueue_scripts()
    {
-
       $settings = $this->getSettings();
 
       // only add javascript if post counts are to be shown or popups are enabled
       if ($settings['show_count'] || $settings['popup']) {
-
-         wp_enqueue_script($this->plugin_slug . '-scripts',
+         wp_enqueue_script($this->plugin_slug . '-script',
             plugins_url('js/public.min.js', __FILE__), array('jquery'), $this->version, true);
       }
+
+       // only add whatsApp sharing if that button is enabled
+       if (strpos($settings['share_services'], 'WhatsApp') !== false) {
+           wp_enqueue_script($this->plugin_slug . '-whatsapp-script',
+               plugins_url('js/whatsapp-share.min.js', __FILE__), array('jquery'), $this->version, true);
+       }
    }
 
    /**
@@ -342,6 +346,8 @@ class SH_Crafty_Social_Buttons_Plugin
          'share_float_buttons' => false,
          'share_float_alignment' => 'right',
          'share_float_height' => '30',
+         'share_nofollow' => false,
+         'share_hover_effect' => 'hover-none',
          'open_in' => 'new_window',
          'popup' => false,
          'email_body' => 'I thought you might like this: ',
@@ -354,11 +360,18 @@ class SH_Crafty_Social_Buttons_Plugin
          'link_caption_position' => 'inline-block',
          'link_alignment' => 'left',
          'link_services' => 'Facebook,Google,Twitter,Ravelry,Etsy,SpecificFeeds',
+         'link_nofollow' => false,
+         'link_hover_effect' => 'hover-none',
          'new_window' => true,
 
          'show_count' => false,
-         'cache_share_count' => false,
+         'cache_share_counts' => false,
          'cache_expiry_minutes' => 5,
+
+         'share_css_classes' => '',
+         'link_css_classes' => '',
+         'post_types_are_filtered' => false,
+         'post_types_for_display' => []
 
       );
       return $settings;

@@ -147,8 +147,9 @@ class SH_Crafty_Social_Buttons_Admin_Fields
       ?>
 
       <?php foreach ($options as $key => $label) { ?>
-      <input type="radio" id="<?php echo $id ?>" name="<?php echo $name ?>" <?php echo checked($key, $value); ?>
-             value="<?php echo $key ?>"/> <?php echo $label; ?>
+        <label>
+       <input type="radio" id="<?php echo $id ?>" name="<?php echo $name ?>" <?php echo checked($key, $value); ?>
+             value="<?php echo $key ?>"/> <?php echo $label; ?> &nbsp; </label>
    <?php } ?>
       <span class="description" for="<?php echo $id ?>">
                 <?php echo $description ?>
@@ -352,6 +353,29 @@ class SH_Crafty_Social_Buttons_Admin_Fields
    <?php
    }
 
+    /** Display selection for caption position */
+    public function renderPostTypeList($args)
+    {
+        $id = $args[0];
+        $name = $this->plugin_slug . '[' . $args[0] . ']';
+        $settings = $this->getSettings();
+        $description = $args[1];
+        $post_types = get_post_types( array('public' => true), 'names' );
+        $values = $settings[$id];
+        if (!is_array($values))
+            $values = array();
+
+        foreach ( $post_types  as $post_type ) {
+            if ($post_type == 'page') continue;
+            ?>
+            <p>
+                <input type="checkbox"  id="<?php echo $id ?>" name="<?php echo $name ?>[]" value="<?php echo $post_type; ?>" <?php checked(in_array($post_type, $values)); ?>>
+                <?php echo $post_type; ?>
+            </p>
+        <?php } ?>
+        <p><?php echo $description; ?></p>
+    <?php
+    }
 
 
    /** Display selection for alignment */
